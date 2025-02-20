@@ -1,0 +1,14 @@
+[Unit]
+Description={{ pyroscope_service_name }}
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ pyroscope_user_id }}
+Group={{ pyroscope_group_id }}
+Restart=on-failure
+Type=simple
+ExecStart={{ pyroscope_exec_command }}
+
+[Install]
+WantedBy=multi-user.target

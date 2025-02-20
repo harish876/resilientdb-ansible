@@ -4,10 +4,12 @@
   become: yes
   vars_files:
     - inventories/production/group_vars/all.yml
+    - inventories/production/group_vars/monitoring.yml
   roles:
     - { role: common, tags: ['all'] }
     - { role: resilientdb, tags: ['all', 'resilientdb'] }
     - { role: crow, tags: ['all', 'crow'] }
     - { role: graphql, tags: ['all', 'graphql'] }
     - { role: nginx, tags: ['all', 'nginx'] }
+    - { role: monitoring, tags: ['monitoring', 'prometheus', 'node_exporter', 'process_exporter', 'pyroscope'] }
   tags: ['all']

@@ -1,0 +1,16 @@
+---
+- include_tasks: setup_prometheus.yml
+  when: "'prometheus' or 'monitoring' in ansible_run_tags"
+  tags: ['monitoring','prometheus']
+
+- include_tasks: setup_node_exporter.yml
+  when: "'node_exporter' or 'monitoring' in ansible_run_tags"
+  tags: ['monitoring','node_exporter']
+
+- include_tasks: setup_process_exporter.yml
+  when: "'process_exporter' or 'monitoring' in ansible_run_tags"
+  tags: ['monitoring','process_exporter']
+
+- include_tasks: setup_pyroscope.yml
+  when: "'pyroscope' or 'monitoring' in ansible_run_tags"
+  tags: ['monitoring','pyroscope']

@@ -1,0 +1,56 @@
+- name: Creating pyroscope user group
+  group: name="{{ pyroscope_group_id }}"
+  become: true
+
+- name: Creating pyroscope user
+  user:
+    name: "{{ pyroscope_user_id }}"
+    group: "{{ pyroscope_group_id }}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{ pyroscope_user_id }} nologin User"
+    createhome: "no"
+    state: present
+
+- name: Create pyroscope data directory
+  file:
+    path: /var/lib/pyroscope
+    state: directory
+    owner: "{{ pyroscope_user_id }}"
+    group: "{{ pyroscope_group_id }}"
+    mode: 0755
+
+- name: Install pyroscope
+  unarchive:
+    src: "https://dl.pyroscope.io/release/pyroscope-{{ pyroscope_version }}-linux-amd64.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy pyroscope file to bin
+  copy:
+    src: "/tmp/pyroscope"
+    dest: "/usr/local/bin/pyroscope"
+    owner: "{{ pyroscope_user_id }}"
+    group: "{{ pyroscope_group_id }}"
+    remote_src: yes
+    mode: 0755
+
+- name: Copy systemd init file
+  template:
+    src: pyroscope.init.service.j2
+    dest: /etc/systemd/system/pyroscope.service
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Start pyroscope service
+  systemd:
+    name: pyroscope
+    state: started
+    enabled: yes
+
+- name: Check if pyroscope emits metrices
+  uri:
+    url: http://127.0.0.1:4040
+    method: GET
+    status_code: 200

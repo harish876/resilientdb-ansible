@@ -1,0 +1,14 @@
+[Unit]
+Description={{ process_exporter_service_name }}
+After=network.target
+
+[Service]
+User={{ process_exporter_user_id }}
+Group={{ process_exporter_group_id }}
+ExecStart={{ process_exporter_exec_command }}
+Restart=always
+RestartSec=5
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

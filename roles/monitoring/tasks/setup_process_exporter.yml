@@ -1,0 +1,67 @@
+---
+- name: Create the process-exporter group
+  group: name="{{ process_exporter_group_id }}"
+  become: true
+
+- name: Creating process-exporter user
+  user:
+    name: "{{ process_exporter_user_id }}"
+    group: "{{ process_exporter_group_id }}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{ process_exporter_user_id }} nologin User"
+    createhome: "no"
+    state: present
+
+- name: Install prometheus process exporter
+  unarchive:
+    src: "https://github.com/ncabatoff/process-exporter/releases/download/v{{ process_exporter_version }}/process-exporter-{{ process_exporter_version }}.linux-amd64.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy prometheus process-exporter file to bin
+  copy:
+    src: "/tmp/process-exporter-{{ process_exporter_version }}.linux-amd64/process-exporter"
+    dest: "/usr/local/bin/process-exporter"
+    owner: "{{ process_exporter_user_id }}"
+    group: "{{ process_exporter_group_id }}"
+    remote_src: yes
+    mode: 0755
+
+- name: Delete process-exporter tmp folder
+  file:
+    path: "/tmp/process-exporter-{{ process_exporter_version }}.linux-amd64"
+    state: absent
+
+- name: Creates process-exporter directory
+  file:
+    path: "/etc/process-exporter/"
+    state: directory
+    owner: "{{ process_exporter_user_id }}"
+    group: "{{ process_exporter_group_id }}"
+    mode: 0755
+
+- name: Copy process-exporter config file
+  template:
+    src: process_exporter.conf.j2
+    dest: /etc/process-exporter/config.yml
+
+- name: Copy process-exporter systemd init file
+  template:
+    src: process_exporter.init.service.j2
+    dest: /etc/systemd/system/process-exporter.service
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Start process-exporter service
+  service:
+    name: process-exporter
+    state: started
+    enabled: yes
+
+- name: Check if process exporter emits metrices
+  uri:
+    url: http://127.0.0.1:9256/metrics
+    method: GET
+    status_code: 200

@@ -3,11 +3,13 @@
   apt_repository:
     repo: "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8"
     state: present
+  tags: ["bazel", "all"]
 
 - name: Update apt cache
   apt:
     update_cache: yes
     cache_valid_time: 3600
+  tags: ["bazel", "all"]
 
 - name: Install Bazel with downgrade allowance
   apt:

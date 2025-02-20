@@ -1,0 +1,24 @@
+---
+prometheus_service_name: prometheus
+prometheus_user_id: prometheus
+prometheus_group_id: prometheus
+prometheus_exec_command: "/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.conf --storage.tsdb.path=/data/prometheus --storage.tsdb.retention=2d"
+prometheus_version: 2.53.0
+
+node_exporter_service_name: node_exporter
+node_exporter_user_id: node_exporter
+node_exporter_group_id: node_exporter
+node_exporter_exec_command: /usr/local/bin/node_exporter
+node_exporter_version: 1.9.0
+
+process_exporter_service_name: process-exporter
+process_exporter_user_id: process-exporter
+process_exporter_group_id: process-exporter
+process_exporter_exec_command: /usr/local/bin/process-exporter -config.path=/etc/process-exporter/config.yml
+process_exporter_version: 0.8.5
+
+pyroscope_service_name: process-exporter
+pyroscope_user_id: process-exporter
+pyroscope_group_id: process-exporter
+pyroscope_exec_command: /usr/local/bin/pyroscope server
+pyroscope_version: 0.37.1
